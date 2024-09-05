@@ -18,11 +18,12 @@ services:
         NGINX_SERVER_FQDN: 
     ports:
       - '80:80'
+      - '8500:8500' 
     ipc: shareable
     #image: checkpoint/infinity-next-nginx
-    #volumes:
-    #  - ./nginx-reverse-proxy/default:/etc/nginx/conf.d/default.conf
-    
+    volumes:
+      - ./nginx-reverse-proxy/default.conf:/etc/nginx/conf.d/default.conf 
+      - ./nginx-reverse-proxy/log:/var/log/nginx    
     
 
   agent-container:
@@ -56,17 +57,13 @@ services:
     hostname: tester
 
 
-  vampi-secure:
-    #image: erev0s/vampi
+  vampi:
+    image: erev0s/vampi
+    container_name: vampi 
     ports: 
-      - '9000:5000'
+      - '5000:5000'
     hostname: vampi
-    build: 
-       dockerfile: Dockerfile
-       context: ./vampi
-      #ports:
-      #- 5000:5000
     environment:
-      - vulnerable=0
-      #hostname: vampi-secure
+      - vulnerable=1
+      - tokentimetolive=3600
 

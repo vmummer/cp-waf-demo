@@ -1,1 +1,4 @@
 .env
+data/
+agent-container/
+nginx-reverse-proxy/log/
