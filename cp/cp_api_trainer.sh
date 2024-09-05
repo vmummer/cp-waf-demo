@@ -3,7 +3,7 @@
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
-# Version 0.2
+# Version 0.3
 #
 #/usr/bin/bash
 
@@ -27,6 +27,7 @@ Written by Vince Mammoliti - vincem@checkpoint.com - 2024
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
   -v | --verbose             provides details of commands excuited against host  
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
+  -s | --sql		     uses sqlmap to attempt to dump database
   -h | --help                this help screen is displayed
 EOF
 exit 1
