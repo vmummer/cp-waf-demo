@@ -3,6 +3,7 @@
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
+# Version 0.2
 #
 #/usr/bin/bash
 
@@ -31,8 +32,22 @@ EOF
 exit 1
 }
 
+gettoken(){
+TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
+	                  -H 'Content-Type: application/json'  \
+                          -d '{ "password": "pass1", "username": "admin" }' \
+			   | jq -r '.auth_token')		       
+return 0
+} 
 
-args=$(getopt -a -o vr:abhc:d: --long alpha,beta,help,gamma:,delta: -- "$@")
+sqldump(){
+gettoken
+sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dump
+exit 0
+}
+
+
+args=$(getopt -a -o vr:s --long help,verbose,repeat:,sql -- "$@")
 
 if [[ $? -gt 0 ]]; then
   usage
@@ -43,9 +58,9 @@ while :
 do
   case $1 in
 	-v | --verbose)   VFLAG=1 ; vResponse='echo' ; shift   ;;
-	-h | --help)    usage      ; shift   ;;
-	-r | --repeat)   REPEAT=$2   ; shift 2 ;;
-        # -- means the end of the arguments; drop this, and break out of the while loop
+	-h | --help)      usage   ; shift   ;;
+	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
+	-s | --sql )      sqldump ; exit 1 ;;
 	--) shift; break ;;
 	*) >&2 echo Unsupported option: $1
 	   usage ;;
@@ -70,10 +85,10 @@ do
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)
    echo "3) GET /users/v1"; $vResponse $OUTPUT
    TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
-        -H 'Content-Type: application/json'  \
-	-d '{ "password": "pass1", "username": "name1" }' \
-	| jq -r '.auth_token')
-   echo "4) POST /user/v1/login"
+	        -H 'Content-Type: application/json'  \
+			-d '{ "password": "pass1", "username": "name1" }' \
+				| jq -r '.auth_token')
+   echo "4) POST /user/v1/login" ; $vResponse $OUTPUT 
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1/admin)
    echo "5) GET /users/v1/admin" ; $vResponse $OUTPUT
    OUTPUT=$(curl -sS -X 'POST'   ${HOST}/books/v1   -H 'accept: application/json' -H 'Content-Type: application/json'          -d '{
@@ -116,3 +131,6 @@ do
 
 done
 exit 0
+
+
+
