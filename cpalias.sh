@@ -1,9 +1,11 @@
 #/usr/bin/bash
-export TOKEN=cp-us-3da3f637-4daa-47c4-9dc6-3195e61e43c0f921089f-f18d-4279-beb0-8c9eb5503c02
+#export TOKEN=
 echo "Adding Check Point AppSec Lab Alias Commands.  Use cphelp for list of commands"
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 alias cptrbad='docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST -w /home/juice-shop-solver appsec-demo_test-host python main.py'
 alias cptrgood='bash cp/cp_test_good.sh'
+alias cpapibad='bash cp/cp_api_bad.sh'
+alias cpapitrainer='bash cp/cp_api_trainer.sh'
 alias cpnano='docker exec -it cp-appsec-agent-container /usr/sbin/cpnano'
 alias cpuninstall='docker exec -it cp-appsec-agent-container /usr/sbin/cpnano --uninstall'
 alias cpagenttoken='docker exec -it cp-appsec-agent-container ./cp-nano-agent --token $TOKEN'
@@ -26,4 +28,6 @@ cpwipe        Wipeout all Docker containers and required to pull new images
 cpfetch       Fetches Clone from GitHub Lab Files appsec-demo.git
 cphost        Shows the IP address of the Docker Host used
 cphelp        Alias Command to help with Check Point Lab
+cpapibad      Create API traffic to demonstrate traffic that should be blocked
+cpapitrainer  Create API traffic to train WAF API gateway
 "'
