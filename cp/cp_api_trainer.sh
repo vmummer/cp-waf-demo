@@ -3,7 +3,7 @@
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
-# Version 0.3
+# Version 0.4
 #
 #/usr/bin/bash
 
@@ -42,6 +42,10 @@ return 0
 } 
 
 sqldump(){
+if ! [ -x "$(command -v sqlmap)" ]; then
+	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
+		        exit 1
+fi
 gettoken
 sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 exit 0
