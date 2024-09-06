@@ -43,7 +43,7 @@ return 0
 
 sqldump(){
 gettoken
-sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dump
+sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 exit 0
 }
 
@@ -63,8 +63,7 @@ do
 	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
 	-s | --sql )      sqldump ; exit 1 ;;
 	--) shift; break ;;
-	*) >&2 echo Unsupported option: $1
-	   usage ;;
+	 *)   usage; exit 1 ;;
    esac
 done
 
@@ -100,8 +99,8 @@ do
    echo "6) POST /books/v1 - new book added"; $vResponse $OUTPUT  
    OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
    echo "7) books/v1/cp-GCWAF-102 - book details"; $vResponse $OUTPUT
-   OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102x   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
-   echo "8) books/v1/cp-GCWAF-102x - bad book lookup "; $vResponse $OUTPUT
+#   OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102x   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
+#   echo "8) books/v1/cp-GCWAF-102x - bad book lookup "; $vResponse $OUTPUT
    OUTPUT=$(curl -sS -X 'POST'   ${HOST}/users/v1/register   -H 'accept: application/json' -H 'Content-Type: application/json'          -d '{
   			"email": "user@cpcgwaf.com",
     			"password": "pass1",
