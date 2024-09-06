@@ -49,11 +49,11 @@ return 0
 } 
 
 sqldump(){
-gettoken
 if ! [ -x "$(command -v sqlmap)" ]; then 
 	echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
 	exit 1
 fi
+gettoken
 sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 exit 0
 }
