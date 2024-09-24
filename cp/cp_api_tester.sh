@@ -18,6 +18,12 @@ VFLAG=0
 REPEAT=1
 HOST="http://juiceshop.local:8500"
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+LINE=10
+CHAR=$(( 80 * $LINE))
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+
 
 usage(){
 >&2 cat << EOF
@@ -42,15 +48,10 @@ return 0
 } 
 
 sqldump(){
-
-if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
-	         HOST=$@
-fi
-
 #if ! [ -x "$(command -v sqlmap)" ]; then
 #	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
 #		        exit 1
-#fi
+#f
 echo "HOST: ${HOST}"
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
@@ -62,8 +63,51 @@ Host: ${TOKEN} " --dbms=sqlite --dump --batch
 exit 0
 }
 
+ifblocked(){
+  if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
+        echo -e "${RED}Check Point - Application Security Blocked ${NC}"
+  fi
+}
 
-args=$(getopt -a -o vr:s --long help,verbose,repeat:,sql -- "$@")
+
+traffic_bad(){
+if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
+		         HOST=$@
+fi
+echo "HOST: ${HOST}"
+echo "REPEAT: ${REPEAT}" 
+echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
+for (( i=0; i < $REPEAT ; ++i));
+do
+  loop=$(($i+1))
+  echo "Loop: $loop"
+  gettoken
+  # Create a Bad Book Lookup
+  echo "1) Send a bad book lookup - sending /books/v1/cp-GCWAF-102x "
+  OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102x   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
+  ifblocked
+  $vResponse ${OUTPUT:0:$CHAR}
+
+  #Create and account attact "user1'"
+  echo "2) Send an attempt to exploit account - send /users/v1/user1' "
+  OUTPUT=$(curl -sS -X GET "${HOST}/users/v1/user1'"  -H 'Content-Type: application/json' \
+               -H "Authorization: Bearer $TOKEN"
+                )
+  ifblocked
+  $vResponse ${OUTPUT:0:$CHAR}
+
+
+  #Create and account attact /users/v1/_debug'"
+  echo "3) Send an attempt to exploit of developer testing tool send /users/v1/_debug "
+  OUTPUT=$(curl -sS -X GET "${HOST}/users/v1/_debug"  -H 'Content-Type: application/json' \
+         -H "Authorization: Bearer $TOKEN"
+               )
+  ifblocked
+  $vResponse ${OUTPUT:0:$CHAR}
+done
+}
+
+args=$(getopt -a -o vr:sb --long help,verbose,repeat:,sql,bad -- "$@")
 
 if [[ $? -gt 0 ]]; then
   usage
@@ -77,6 +121,7 @@ do
 	-h | --help)      usage   ; shift   ;;
 	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
 	-s | --sql )      sqldump ; exit 1 ;;
+	-b | --bad)       traffic_bad ; exit 1 ;; 
 	--) shift; break ;;
 	 *)   usage; exit 1 ;;
    esac
