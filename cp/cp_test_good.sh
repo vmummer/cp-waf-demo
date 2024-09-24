@@ -14,7 +14,7 @@ fi
 for (( i=0; i<$repeat; ++i)); do
 	loop=$(($i+1))
 	echo "$loop of $repeat) Testing Against URL: $host"
-	docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST appsec-demo_test-host python /home/web-scraper/websitescrap.py $host
+	docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST appsec-demo-test-host python /home/web-scraper/websitescrap.py $host
 
 
 done
