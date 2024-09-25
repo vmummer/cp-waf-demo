@@ -1,5 +1,5 @@
 #/usr/bin/bash
-export TOKEN=
+#export TOKEN=
 echo "Adding Check Point AppSec Lab Alias Commands.  Use cphelp for list of commands"
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 alias cptrbad='docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST -w /home/juice-shop-solver appsec-demo-test-host python main.py'
