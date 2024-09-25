@@ -23,6 +23,7 @@ CHAR=$(( 80 * $LINE))
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 BFLAG=0
+INITDB=0
 SFLAG=0	
 
 usage(){
@@ -35,6 +36,7 @@ Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST]
   -m | --malicious           send malicious type traffic (Default will be know good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
+  -i | --initdb              initialize Vampi Database
   -h | --help                this help screen is displayed
 EOF
 exit 1
@@ -47,6 +49,33 @@ TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json
 			   | jq -r '.auth_token')		       
 return 0
 } 
+
+checkdb(){
+#This check to see if the Vampi DB has been initilized. By default its not and needs to be.
+   $vResponse -e "Checking Vampi DB has been initilized\n"
+   OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)
+   if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
+	            echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize to Continue.  You can use the $0 --initdb option to initialize the Vampi DB. ${NC}"
+		    exit 1
+     fi
+}
+
+
+initdb(){
+  echo -e "Initilizing VampiDB\n"
+  OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)   # Checking to see if has been initialized first
+     if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
+	     OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/createdb)
+	     if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
+	            echo -e "${RED}Check Point - Application Security Blocked ${NC}"
+		    echo -e "Reexecute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
+		    exit 1
+	     fi	       
+         exit 1
+     fi
+}
+
+
 
 sqldump(){
 # The follow was removed because sqlmap was added to the tester container to run
@@ -111,7 +140,7 @@ done
 exit 1
 }
 
-args=$(getopt -a -o vr:sm --long help,verbose,repeat:,sql,malicious -- "$@")
+args=$(getopt -a -o vr:smi --long help,verbose,repeat:,sql,malicious,initdb -- "$@")
 
 
 
@@ -128,7 +157,8 @@ do
 	-h | --help)      usage   ; shift   ;;
 	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
 	-s | --sql )      SFLAG=1 ; shift  ;;
-	-m | --malicious)       BFLAG=1  ; shift ;; 
+	-m | --malicious) BFLAG=1  ; shift ;; 
+	-i | --initdb)	  INITDB=1 ; shift ;;
 	--) shift; break ;;
 	 *)   usage; exit 1 ;;
    esac
@@ -140,14 +170,19 @@ fi
 
 echo "HOST: ${HOST}"
 $vResponse "BFLAG: ${BFLAG}"
-
-if [ $BFLAG -eq  1 ]; then 
+if [ $INITDB -eq 1 ]; then
+	initdb
+	exit 1
+elif	[ $BFLAG -eq  1 ]; then 
+	checkdb  # Check added to validate that the Vampi dB has been initized 
 	traffic_bad
 	exit 1
 elif [ $SFLAG -eq 1 ] ; then
+	checkdb
 	sqldump
 	exit 1
 else 
+checkdb
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
 for (( i=0; i < $REPEAT ; ++i));
 do
