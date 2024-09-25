@@ -3,7 +3,7 @@
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
-# Version 0.5  - Sept 25, 2024
+# Version 0.6  - Sept 25, 2024
 #
 #
 #/usr/bin/bash
@@ -72,6 +72,8 @@ initdb(){
 		    echo -e "Reexecute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
 		    exit 1
 	     fi	       
+     else 
+	 echo -e "VampiDB is already Initilized"	     
          exit 1
      fi
 }
@@ -137,6 +139,16 @@ do
                )
   ifblocked
   $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+  echo "4) DELETE /users/v1/cgwaf2 "
+  OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
+         -H "Authorization: Bearer $TOKEN"
+           )
+  ifblocked
+  $vResponse $OUTPUT
+
+
+
 done
 exit 1
 }
@@ -189,55 +201,75 @@ for (( i=0; i < $REPEAT ; ++i));
 do
    loop=$(($i+1))
    echo "Loop: $loop"
+   echo "1) GET /"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/)
-   echo "1) GET /"; $vResponse $OUTPUT ; # If -v is enabled - prints out result of curl
+   $vResponse $OUTPUT ; # If -v is enabled - prints out result of curl
+
+   echo "2) GET /books/v1"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/books/v1)
-   echo "2) GET /books/v1"; $vResponse $OUTPUT
+   $vResponse $OUTPUT
+   
+   echo "3) GET /users/v1"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)
-   echo "3) GET /users/v1"; $vResponse $OUTPUT
+   $vResponse $OUTPUT
+
+   echo "4) POST /user/v1/login"
    TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
 	        -H 'Content-Type: application/json'  \
 			-d '{ "password": "pass1", "username": "name1" }' \
 				| jq -r '.auth_token')
-   echo "4) POST /user/v1/login" ; $vResponse $OUTPUT 
+   $vResponse $OUTPUT 
+   
+   echo "5) GET /users/v1/admin"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1/admin)
-   echo "5) GET /users/v1/admin" ; $vResponse $OUTPUT
+   $vResponse $OUTPUT
+
+
+   echo "6) POST /books/v1 - new book added"
    OUTPUT=$(curl -sS -X 'POST'   ${HOST}/books/v1   -H 'accept: application/json' -H 'Content-Type: application/json'          -d '{
                "book_title": "cp-GCWAF-102",
                "secret": "cp-secret"
              }' -H "Authorization: Bearer $TOKEN "
 	   )
-   echo "6) POST /books/v1 - new book added"; $vResponse $OUTPUT  
+   $vResponse $OUTPUT  
+
+   echo "7) books/v1/cp-GCWAF-102 - book details"
    OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
-   echo "7) books/v1/cp-GCWAF-102 - book details"; $vResponse $OUTPUT
-#   OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102x   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
-#   echo "8) books/v1/cp-GCWAF-102x - bad book lookup "; $vResponse $OUTPUT
+   $vResponse $OUTPUT
+
+   echo "9) POST /users/v1/register - add a new users "
    OUTPUT=$(curl -sS -X 'POST'   ${HOST}/users/v1/register   -H 'accept: application/json' -H 'Content-Type: application/json'          -d '{
   			"email": "user@cpcgwaf.com",
     			"password": "pass1",
       			"username": "cgwaf2"
 		      }'
 	  )
-   echo "9) POST /users/v1/register - add a new users "; $vResponse $OUTPUT
-   OUTPUT=$(curl -sS -X PUT   ${HOST}/users/v1/cgwaf2/email   -H 'accept: */*' -H 'Content-Type: application/json' \
+   $vResponse $OUTPUT
+
+   echo "10) PUT /users/v1/cpgwaf2/email - update email of user "
+   OUTPUT=$(curl -s -w "%{http_code}\n" -X PUT   ${HOST}/users/v1/cgwaf2/email   -H 'accept: */*' -H 'Content-Type: application/json' \
 	 -d '{
           	"email": "use3@cp.com"
 	     }' -H "Authorization: Bearer $TOKEN"
 	  )
-   echo "10) GET /users/v1/cpgwaf2/email - update email of user "; $vResponse $OUTPUT
-   OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
-		               -H "Authorization: Bearer $TOKEN"
-           )
-   echo "11) DELETE /users/v1/cgwaf2 "; $vResponse $OUTPUT
+  if echo "$OUTPUT" |  grep -q -o '204'; then
+	          $vResponse -e "Update successfull - 204 code"
+	  else 	
+ 		$vResponse -e "${RED}User update email - Failed - Did receive 204 doe ${NC}"
+  fi
+
+
+   echo "11) POST /user/v1/login - login as admin user"
    TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
 	         -H 'Content-Type: application/json'  \
 		         -d '{ "password": "pass1", "username": "admin" }' \
 			         | jq -r '.auth_token')
-   echo "12) POST /user/v1/login - login as admin user"
+
+   echo "12) DELETE /users/v1/cgwaf2 - as an admin user"
    OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
                  -H "Authorization: Bearer $TOKEN"
                 )
-   echo "11) DELETE /users/v1/cgwaf2 - as an admin user"; $vResponse $OUTPUT
+   $vResponse $OUTPUT
 
 
 done
