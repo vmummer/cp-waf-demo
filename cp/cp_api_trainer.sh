@@ -5,6 +5,7 @@
 # Write by Vince Mammoliti - vincem@checkpoint.com
 # Version 0.5  - Sept 25, 2024
 #
+#
 #/usr/bin/bash
 
 set -euo pipefail
