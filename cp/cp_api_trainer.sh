@@ -3,13 +3,13 @@
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
-# Version 0.4
+# Version 0.5  - Sept 25, 2024
 #
 #/usr/bin/bash
 
 set -euo pipefail
 
-declare vResponse='silentResponse'
+declare vResponse='silentResponse'   # This is method for creating verbose debug info. When more verbose is required this will be set to the 'echo' command
 function silentResponse () {
        	:
 }
@@ -18,14 +18,21 @@ VFLAG=0
 REPEAT=1
 HOST="http://juiceshop.local:8500"
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+LINE=10
+CHAR=$(( 80 * $LINE))
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+BFLAG=0
+SFLAG=0	
 
 usage(){
 >&2 cat << EOF
 $0 is an API training tool to demonstrate the API learning capability of the Check Point Cloud Guard WAF
-Written by Vince Mammoliti - vincem@checkpoint.com - 2024
+Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2024
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
   -v | --verbose             provides details of commands excuited against host  
+  -m | --malicious           send malicious type traffic (Default will be know good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
   -h | --help                this help screen is displayed
@@ -42,16 +49,12 @@ return 0
 } 
 
 sqldump(){
-
-if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
-	         HOST=$@
-fi
-
+# The follow was removed because sqlmap was added to the tester container to run
 #if ! [ -x "$(command -v sqlmap)" ]; then
 #	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
 #		        exit 1
-#fi
-echo "HOST: ${HOST}"
+#f
+$vResponse "HOST: ${HOST}"
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 
@@ -62,12 +65,60 @@ Host: ${TOKEN} " --dbms=sqlite --dump --batch
 exit 0
 }
 
+ifblocked(){
+  if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
+        echo -e "${RED}Check Point - Application Security Blocked ${NC}"
+  fi
+}
 
-args=$(getopt -a -o vr:s --long help,verbose,repeat:,sql -- "$@")
 
-if [[ $? -gt 0 ]]; then
-  usage
+traffic_bad(){
+if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
+		         HOST=$@
 fi
+$vResponse "REPEAT: ${REPEAT}" 
+echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
+echo -e " Sending Malicious API Traffic"
+
+for (( i=0; i < $REPEAT ; ++i));
+do
+  loop=$(($i+1))
+  echo "Loop: $loop"
+  gettoken
+  # Create a Bad Book Lookup
+  echo "1) Send a bad book lookup - sending /books/v1/cp-GCWAF-102x "
+  OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102x   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
+  ifblocked
+  $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+  #Create and account attact "user1'"
+  echo "2) Send an attempt to exploit account - send /users/v1/user1' "
+  OUTPUT=$(curl -sS -X GET "${HOST}/users/v1/user1'"  -H 'Content-Type: application/json' \
+               -H "Authorization: Bearer $TOKEN"
+                )
+  ifblocked
+  $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+
+  #Create and account attact /users/v1/_debug'"
+  echo "3) Send an attempt to exploit of developer testing tool send /users/v1/_debug "
+  OUTPUT=$(curl -sS -X GET "${HOST}/users/v1/_debug"  -H 'Content-Type: application/json' \
+         -H "Authorization: Bearer $TOKEN"
+               )
+  ifblocked
+  $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+done
+exit 1
+}
+
+args=$(getopt -a -o vr:sm --long help,verbose,repeat:,sql,malicious -- "$@")
+
+
+
+#if [[ $? -gt 0 ]]; then
+#if [[ $# -eq 0 ]]; then
+#  usage
+#fi
 
 eval set -- ${args}
 while :
@@ -75,8 +126,9 @@ do
   case $1 in
 	-v | --verbose)   VFLAG=1 ; vResponse='echo' ; shift   ;;
 	-h | --help)      usage   ; shift   ;;
-	-r | --repeat)    REPEAT=$2  ; echo "REPEAT: ${REPEAT}"; shift 2 ;;
-	-s | --sql )      sqldump ; exit 1 ;;
+	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
+	-s | --sql )      SFLAG=1 ; shift  ;;
+	-m | --malicious)       BFLAG=1  ; shift ;; 
 	--) shift; break ;;
 	 *)   usage; exit 1 ;;
    esac
@@ -87,7 +139,15 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 fi
 
 echo "HOST: ${HOST}"
+$vResponse "BFLAG: ${BFLAG}"
 
+if [ $BFLAG -eq  1 ]; then 
+	traffic_bad
+	exit 1
+elif [ $SFLAG -eq 1 ] ; then
+	sqldump
+	exit 1
+else 
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
 for (( i=0; i < $REPEAT ; ++i));
 do
@@ -145,6 +205,7 @@ do
 
 
 done
+fi
 exit 0
 
 
