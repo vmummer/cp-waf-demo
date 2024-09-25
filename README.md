@@ -1,6 +1,6 @@
 # Check Point CloudGuard WAF demo using Docker
  
- This is an enhancement to Stuart Green's simple docker-compose environment for deploy a Check Point WAF embedded nano-agent demo. The enhancement allows for running on Windows WSL and includes an additional Client Host for traffic generations of good and bad traffic.
+ This is an enhancement to Stuart Green's simple docker-compose environment for deploy a Check Point WAF embedded nano-agent demo. The enhancement allows for running on Windows WSL if required or any standard linix distribution shoud work. It also includes an additional Client Host for traffic generations of good and bad web and API traffic.
   
 The deployment includes four containers, an NGINX reverse proxy, an agent-container (the nano-agent), tester host with traffic generators and the OWASP JuiceShop app.
  This was based off of Stuart Green's work
@@ -18,9 +18,9 @@ You will have two ways to access the Juice Store Web Site:
 * From a machine with docker and docker-compose installed, run:  
 ```
 source cpalias.sh          << Load Aliase commands
-cptoken  cp-us-....token   << Token from Check Point Infinity Portal - WAF>
+cptoken  cp-us-....token   << Token from Check Point Infinity Portal - WAF - puts token in .env so you don't have keep doing it>
 
-cpcert                     << WSL does not provide CA certs - fetches the required to build the Docker Images.
+cpcert                     << WSL does not provide CA certs - fetches the required to build the Docker Images. Only if you are using WSL
 docker-compose down -v --remove-orphans
 docker-compose build
 docker-compose up
