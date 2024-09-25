@@ -17,7 +17,8 @@ if [ -z "$1" ]; then
         exit 1	
 else
         sed -i 's/TOKEN=.*/TOKEN='$1'/' .env
-        sed -i 's/TOKEN=.*/TOKEN='$1'/' cpalias.sh
+#       sed -i 's/TOKEN=.*/TOKEN='$1'/' cpalias.sh
+#       removed the above line so we don't write the Token in the cpalias.sh  and make public just using .env 
         export TOKEN=$1
         echo -e "TOKEN varable is changed to: $TOKEN in .env and cpalias.sh file."
 #	echo -e "Important reload the file via issuing the following command: \n source .env \n for variable to be set. "
