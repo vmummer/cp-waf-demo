@@ -75,7 +75,7 @@ do
   case $1 in
 	-v | --verbose)   VFLAG=1 ; vResponse='echo' ; shift   ;;
 	-h | --help)      usage   ; shift   ;;
-	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
+	-r | --repeat)    REPEAT=$2  ; echo "REPEAT: ${REPEAT}"; shift 2 ;;
 	-s | --sql )      sqldump ; exit 1 ;;
 	--) shift; break ;;
 	 *)   usage; exit 1 ;;
