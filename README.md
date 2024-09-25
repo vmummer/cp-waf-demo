@@ -8,7 +8,10 @@ The deployment includes four containers, an NGINX reverse proxy, an agent-contai
 You will have two ways to access the Juice Store Web Site:  
 * Port 80: Protected by AppSec  
 * Port 3000: Direct to JuiceShop (unprotected)  
-  
+
+* Port 5000: Direct to Vampi API (unprotected)  
+* Port 8500: Direct to Vampi API (protected)  
+
 ## Instructions:
  
 * Clone the repository
@@ -31,7 +34,7 @@ cptrgood http://juiceshop.local:80     # Use to generate good traffic
 
 cptrbad http://juiceshop.local:80      # Use to generate questionable traffic on the Juiceshop website
 
-```
+cpapitrainer                           # Used to train the WAF API gateway and with -m to create malicious traffic 
 docker-compose down
 ```
  
