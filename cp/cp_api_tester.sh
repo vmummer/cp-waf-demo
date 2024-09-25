@@ -22,8 +22,8 @@ LINE=10
 CHAR=$(( 80 * $LINE))
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-
-
+BFLAG=0
+SFLAG=0	
 
 usage(){
 >&2 cat << EOF
@@ -77,6 +77,7 @@ fi
 echo "HOST: ${HOST}"
 echo "REPEAT: ${REPEAT}" 
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
+
 for (( i=0; i < $REPEAT ; ++i));
 do
   loop=$(($i+1))
@@ -105,11 +106,16 @@ do
   ifblocked
   $vResponse ${OUTPUT:0:$CHAR}
 done
+exit 1
 }
 
 args=$(getopt -a -o vr:sb --long help,verbose,repeat:,sql,bad -- "$@")
 
+
+echo "arg  $#"
+
 if [[ $? -gt 0 ]]; then
+#if [[ $# -ne 0 ]]; then
   usage
 fi
 
@@ -120,8 +126,8 @@ do
 	-v | --verbose)   VFLAG=1 ; vResponse='echo' ; shift   ;;
 	-h | --help)      usage   ; shift   ;;
 	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
-	-s | --sql )      sqldump ; exit 1 ;;
-	-b | --bad)       traffic_bad ; exit 1 ;; 
+	-s | --sql )      SFLAG=1 ; shift  ;;
+	-b | --bad)       BFLAG=1  ; shift ;; 
 	--) shift; break ;;
 	 *)   usage; exit 1 ;;
    esac
@@ -132,7 +138,15 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 fi
 
 echo "HOST: ${HOST}"
+echo "BFLAG: ${BFLAG}"
 
+if [ $BFLAG -eq  1 ]; then 
+	traffic_bad
+	exit 1
+elif [ $SFLAG -eq 1 ] ; then
+	sqldump
+	exit 1
+else 
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
 for (( i=0; i < $REPEAT ; ++i));
 do
@@ -190,6 +204,7 @@ do
 
 
 done
+fi
 exit 0
 
 
