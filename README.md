@@ -31,8 +31,9 @@ docker-compose up
 cphelp     - Will show alias command useful for this demo
 
 cpnano -s			       # Check status of the WAF - needs to say "CloudGuard AppSec is up-to-date and ready"
-                                       #  If not then reinstall the TOKEN - by  checking if you have saved the TOKEN 
-				       #  cptoken will display the TOKEN if you have and then issuing cpagenttoken to reinstall the TOKEN
+
+cpnanol				       # Check to see if policy has been push and updated
+                                       
 cptrgood http://juiceshop.local:80     # Use to generate good traffic 
                                          - This just does a simple crawl of the Juiceshop website
 
@@ -52,8 +53,7 @@ ie:
 
 /home/lab/cp-waf-demo# cphost
 Docker Host IP address used: 172.29.126.121
-
-
 add into /etc/hosts
-
 172.29.126.121 juiceshop.local 
+
+> The Vampi Database needs to be initialized. This can be done by issuing cpapitrainer --initdb http://juiceshop.local:5000   
