@@ -2,8 +2,8 @@
  
  This is an enhancement to Stuart Green's simple docker-compose environment for deploy a Check Point WAF embedded nano-agent demo. The enhancement allows for running on Windows WSL if required or any current standard linux distribution. It also includes an additional Client Host for traffic generations of good and bad web and API traffic.
   
-The deployment includes four containers, Check Point combined WAF and Nginx container, tester host with traffic generators, OWASP JuiceShop app and Vampi Api Test Host.
- This was based off of Stuart Green's work
+The deployment includes four containers, Check Point combined WAF and Nginx container(combined), tester host with traffic generators, OWASP JuiceShop app and Vampi Api Test Host.
+ This was based off of Stuart Green's work.
 
 You will have two ways to access the Juice Store Web Site:  
 * Port 80: Protected by AppSec  
@@ -44,10 +44,9 @@ cptrbad http://juiceshop.local:80      # Use to generate questionable traffic on
 cpapitrainer                           # Used to train the WAF API gateway and with -m to create malicious traffic 
 docker-compose down
 ```
- 
+> Notes:
 
-
-> Notes: 
+On the Infinity Portal when setting up the Assets Note the Reverse Proxy for the Juice Shop will be:   http://juiceshop:3000  and for API  http://vampi:5000.  The host name are the docker container names of the applications. Docker will do a look up on the host names juiceshop and vampi and will forward the traffic to the containers running the application on the assigned ports.
 
 Suggest you add juiceshop.local into your local systems /etc/hosts file. You can use the cphost to provide you with the local host IP address. 
 
