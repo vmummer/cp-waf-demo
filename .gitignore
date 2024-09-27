@@ -1,5 +1,4 @@
 .env
 data/
-agent-container/
-nginx-reverse-proxy/log/
-kitrunner/
+cp-waf/log
+cp-waf/conf

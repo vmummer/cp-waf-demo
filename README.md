@@ -2,7 +2,7 @@
  
  This is an enhancement to Stuart Green's simple docker-compose environment for deploy a Check Point WAF embedded nano-agent demo. The enhancement allows for running on Windows WSL if required or any current standard linux distribution. It also includes an additional Client Host for traffic generations of good and bad web and API traffic.
   
-The deployment includes four containers, an NGINX reverse proxy, an agent-container (the nano-agent), tester host with traffic generators and the OWASP JuiceShop app.
+The deployment includes four containers, Check Point WAF and Nginx, tester host with traffic generators, OWASP JuiceShop app and Vampi Api Test container.
  This was based off of Stuart Green's work
 
 You will have two ways to access the Juice Store Web Site:  
@@ -30,6 +30,9 @@ docker-compose up
 
 cphelp     - Will show alias command useful for this demo
 
+cpnano -s			       # Check status of the WAF - needs to say "CloudGuard AppSec is up-to-date and ready"
+                                       #  If not then reinstall the TOKEN - by  checking if you have saved the TOKEN 
+				       #  cptoken will display the TOKEN if you have and then issuing cpagenttoken to reinstall the TOKEN
 cptrgood http://juiceshop.local:80     # Use to generate good traffic 
                                          - This just does a simple crawl of the Juiceshop website
 
@@ -47,7 +50,7 @@ Suggest you add juiceshop.local into your local systems /etc/hosts file. You can
 
 ie: 
 
-/home/lab/cp-wap-demo# cphost
+/home/lab/cp-waf-demo# cphost
 Docker Host IP address used: 172.29.126.121
 
 
