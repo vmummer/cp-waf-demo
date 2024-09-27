@@ -2,7 +2,7 @@
  
  This is an enhancement to Stuart Green's simple docker-compose environment for deploy a Check Point WAF embedded nano-agent demo. The enhancement allows for running on Windows WSL if required or any current standard linux distribution. It also includes an additional Client Host for traffic generations of good and bad web and API traffic.
   
-The deployment includes four containers, Check Point WAF and Nginx, tester host with traffic generators, OWASP JuiceShop app and Vampi Api Test container.
+The deployment includes four containers, Check Point combined WAF and Nginx container, tester host with traffic generators, OWASP JuiceShop app and Vampi Api Test Host.
  This was based off of Stuart Green's work
 
 You will have two ways to access the Juice Store Web Site:  
@@ -25,6 +25,8 @@ cpcert                     << WSL does not provide CA certs - fetches the requir
 docker-compose down -v --remove-orphans
 docker-compose build
 docker-compose up
+
+<Can use newer docker compose <commands> as compared to the older docker-compose.  Compose plugin needs to be install.
 ```
 [DEMO HERE]
 
