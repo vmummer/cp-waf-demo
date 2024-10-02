@@ -12,7 +12,7 @@ alias cptoken="bash cp/cp_token.sh"
 alias cpnanol='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "Policy|Last" ' 
 alias cpwipe='docker-compose down &&  docker system prune -a'
 alias cpcert='sh cp/cp_get_cert.sh'
-alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/appsec-demo.git'
+alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/cp-waf-demo.git'
 alias cphost='printf "Docker Host IP address used: $DOCKER_HOST \n"'
 alias cphelp='printf "Check Point Lab Commands:\n
 cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
@@ -24,7 +24,7 @@ cpcert        Fetch Cert required to load docker images
 cptrbad       Juiceshop Bad  Traffic Generator
 cptrgrood     Juiceshop Good Traffic Generator
 cpwipe        Wipeout all Docker containers and required to pull new images
-cpfetch       Fetches Clone from GitHub Lab Files appsec-demo.git
+cpfetch       Fetches Files and Templates to be used in this Lab from GitHub
 cphost        Shows the IP address of the Docker Host used
 cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
