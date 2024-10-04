@@ -1,11 +1,11 @@
 #/usr/bin/bash
-if [[ $PWD =~ .*appsec-demo/cp ]];then
-        echo -e "cp_token is required to be run from <....>/appsec-demo root directory"
+if [[ $PWD =~ .*-demo/cp ]];then
+        echo -e "cp_token is required to be run from <....>/cp-waf-demo root directory"
         exit 1
 fi
 if [ -z "$1" ]; then
-        echo "Usage  cp_token         - Display curent TOKEN value" 
-	echo "       cp_token <TOKEN> - Set TOKEN Variable - <Check Point AppSec TOKEN copied from Infinity AppSEC portal>"
+        echo "Usage  cptoken        - Display curent TOKEN value" 
+	echo "       cptoken <TOKEN> - Set TOKEN Variable - <Check Point CG WAF TOKEN copied from Infinity portal>"
         echo ""
 	source .env
         if [[ $TOKEN ]]; then
@@ -20,6 +20,6 @@ else
 #       sed -i 's/TOKEN=.*/TOKEN='$1'/' cpalias.sh
 #       removed the above line so we don't write the Token in the cpalias.sh  and make public just using .env 
         export TOKEN=$1
-        echo -e "TOKEN varable is changed to: $TOKEN in .env and cpalias.sh file."
+        echo -e "TOKEN varable is changed to: $TOKEN in .env file."
 #	echo -e "Important reload the file via issuing the following command: \n source .env \n for variable to be set. "
 fi
