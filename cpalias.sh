@@ -12,17 +12,18 @@ alias cpuninstall='docker exec -it cp-waf /usr/sbin/cpnano --uninstall'
 alias cpagenttoken='docker exec -it cp-waf ./cp-nano-agent.sh --token ${TOKEN}'
 alias cptoken="bash cp/cp_token.sh"
 alias cpnanol='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "Policy|Last" ' 
-alias cpnanob='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "CloudGuard" '
+alias cpnanos='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "CloudGuard" '
 alias cpwipe='docker-compose down &&  docker system prune -a'
 alias cpcert='sh cp/cp_get_cert.sh'
 alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/cp-waf-demo.git'
 alias cphost='printf "Docker Host IP address used: $DOCKER_HOST \n"'
 alias cphelp='printf "Check Point Lab Commands:\n
-cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
-cpnanol       Show last update of the AppSec Agent
-cpuninstall   Uninstall AppSec Agent
-cpagenttoken  Install AppSec Agent and assign Token
-cptoken       Display and update AppSec Agent Token Variable
+cpnano        Show detail status of WAF Agent ( use as cpnano -s)
+cpnanos       Show the overall status of the WAF
+cpnanol       Show last policy update of the WAF Agent
+cpuninstall   Uninstall WAF Agent
+cpagenttoken  Install WAF Agent and assign Token
+cptoken       Display and update WAF Agent Token Variable
 cpcert        Fetch Cert required to load docker images
 cptrbad       Juiceshop Bad  Traffic Generator
 cptrgrood     Juiceshop Good Traffic Generator
