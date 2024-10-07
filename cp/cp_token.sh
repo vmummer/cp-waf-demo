@@ -4,12 +4,14 @@ if [[ $PWD =~ .*-demo/cp ]];then
         exit 1
 fi
 if [ -z "$1" ]; then
-        echo "Usage  cptoken        - Display curent TOKEN value" 
+        echo "Usage  cptoken         - Display curent TOKEN value" 
 	echo "       cptoken <TOKEN> - Set TOKEN Variable - <Check Point CG WAF TOKEN copied from Infinity portal>"
         echo ""
+	declare TOKEN
 	source .env
         if [[ $TOKEN ]]; then
 	       echo -e "TOKEN variable is set to: $TOKEN \n"
+	       export TOKEN
 	       exit 1
 	       else
 	          echo "TOKEN variable is NOT SET!  Please set before continuing with LAB"

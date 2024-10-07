@@ -1,8 +1,8 @@
 #/usr/bin/bash
 #export TOKEN=
 # Updated Oct 2, 2024 - Added cpnanob
-VERSION=2.1
-echo "Adding Check Point WAF Lab Alias Commands, version ${VERSION}.  Use cphelp for list of commands"
+VERSION=2.2
+echo "Adding Check Point WAF Lab Alias Commands, 2024 ver ${VERSION}.  Use cphelp for list of additional available commands"
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 alias cptrbad='docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST -w /home/juice-shop-solver cp-waf-demo-test-host python main.py'
 alias cptrgood='bash cp/cp_test_good.sh'

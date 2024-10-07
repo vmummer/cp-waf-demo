@@ -4,6 +4,7 @@
 # the auto learning
 # Write by Vince Mammoliti - vincem@checkpoint.com
 # Version 0.6  - Sept 25, 2024
+# Version 0.7  - Oct 7th 2024 - corrected Spelling
 #
 #
 #/usr/bin/bash
@@ -33,8 +34,8 @@ $0 is an API training tool to demonstrate the API learning capability of the Che
 Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2024
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
-  -v | --verbose             provides details of commands excuited against host  
-  -m | --malicious           send malicious type traffic (Default will be know good training traffic)
+  -v | --verbose             provides details of commands executed against host  
+  -m | --malicious           send malicious type traffic (Default will be good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
   -i | --initdb              initialize Vampi Database
