@@ -1,4 +1,5 @@
 .env
 data/
+cp-waf/etc
 cp-waf/log
 cp-waf/conf
