@@ -34,7 +34,8 @@ $0 is an API training tool to demonstrate the API learning capability of the Che
 Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2024
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
-  -v | --verbose             provides details of commands executed against host  
+  -v | --verbose             provides details of commands executed against the API Vampi :Wq
+host  
   -m | --malicious           send malicious type traffic (Default will be good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
@@ -91,7 +92,7 @@ $vResponse "HOST: ${HOST}"
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 
-docker run -it --rm --add-host juiceshop.local:$DOCKER_HOST appsec-demo-test-host sqlmap -u $HOST"/users/v1/*name1*" --method=GET --headers="Accept: a
+docker run -it --rm --add-host juiceshop.local:$DOCKER_HOST cp-waf-demo-test-host sqlmap -u $HOST"/users/v1/*name1*" --method=GET --headers="Accept: a
 pplication/json\nAuthorization: Bearer $TOKEN \n
 Host: ${TOKEN} " --dbms=sqlite --dump --batch
 
@@ -238,7 +239,7 @@ do
    OUTPUT=$(curl -sS -X GET  ${HOST}/books/v1/cp-GCWAF-102   -H 'accept: application/json'  -H "Authorization: Bearer $TOKEN" )
    $vResponse $OUTPUT
 
-   echo "9) POST /users/v1/register - add a new users "
+   echo "9) POST /users/v1/register - add a new user"
    OUTPUT=$(curl -sS -X 'POST'   ${HOST}/users/v1/register   -H 'accept: application/json' -H 'Content-Type: application/json'          -d '{
   			"email": "user@cpcgwaf.com",
     			"password": "pass1",
