@@ -1,3 +1,0 @@
-   server_names_hash_bucket_size 64;
-   server { listen 80; return 444; }
-   server { listen 8500; return 444; }
