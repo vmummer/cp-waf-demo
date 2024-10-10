@@ -58,20 +58,20 @@ checkdb(){
    $vResponse -e "Checking Vampi DB has been initilized\n"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)
    if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
-	            echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize to Continue.  You can use the $0 --initdb option to initialize the Vampi DB. ${NC}"
+	            echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize the DB in order to Continue.  You can use the $0 --initdb option to initialize the Vampi DB. ${NC}"
 		    exit 1
      fi
 }
 
 
 initdb(){
-  echo -e "Initilizing VampiDB\n"
+  echo -e "Initializing VampiDB\n"
   OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)   # Checking to see if has been initialized first
      if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
 	     OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/createdb)
 	     if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
 	            echo -e "${RED}Check Point - Application Security Blocked ${NC}"
-		    echo -e "Reexecute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
+		    echo -e "Execute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
 		    exit 1
 	     fi	       
      else 
@@ -148,6 +148,12 @@ do
            )
   ifblocked
   $vResponse $OUTPUT
+
+  echo "5) Try to access the Swagger UI  get /ui/   "
+  OUTPUT=$(curl -sS ${HOST}/ui/ )
+  ifblocked
+  $vResponse $OUTPUT
+
 
 
 
@@ -259,7 +265,7 @@ do
 	  else 	
  		$vResponse -e "${RED}User update email - Failed - Did receive 204 doe ${NC}"
   fi
-
+   
 
    echo "11) POST /user/v1/login - login as admin user"
    TOKEN=$(curl -sS -X POST   ${HOST}/users/v1/login   -H 'accept: application/json' \
@@ -271,6 +277,7 @@ do
    OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
                  -H "Authorization: Bearer $TOKEN"
                 )
+   ifblocked
    $vResponse $OUTPUT
 
 
