@@ -1,5 +1,8 @@
-FROM python:3.8-slim
-MAINTAINER Vince Mammoliti vincem@checkpoint.com
+# Oct 16, 2024 - changed to python:3-slim
+#FROM python:3.8-slim
+FROM python:3.12-slim
+#MAINTAINER Vince Mammoliti vincem@checkpoint.com
+LABEL org.opencontainers.image.authors="vincem@checkpoint.com"
 # Sept 14, 2022
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-transport-https ca-certificates git  -y
 RUN pip install --trusted-host pypi.python.org --trusted-host files.pythonhosted.org  beautifulsoup4 certifi chardet idna lxml psutil redis redislite requests soupsieve urllib3  zmq selenium hashids

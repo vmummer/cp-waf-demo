@@ -18,7 +18,8 @@ function silentResponse () {
 
 VFLAG=0
 REPEAT=1
-HOST="http://juiceshop.local:8500"
+HOST="http://juiceshop.local:8500"   # Protected WAF API URL
+HOSTNP="http://juiceshop.local:5000" # Non Protected WAF API URL
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 LINE=10
 CHAR=$(( 80 * $LINE))
@@ -34,13 +35,18 @@ $0 is an API training tool to demonstrate the API learning capability of the Che
 Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2024
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
-  -v | --verbose             provides details of commands executed against the API Vampi :Wq
-host  
+  -v | --verbose             provides details of commands executed against the API Vampi host 
   -m | --malicious           send malicious type traffic (Default will be good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
   -i | --initdb              initialize Vampi Database
   -h | --help                this help screen is displayed
+
+Currently default settings:
+                         Docker Host: ${DOCKER_HOST}
+          Default Protected Host URL: ${HOST}
+Default Non-Protected VAmPI Host URL: ${HOSTNP} 
+(Defaults can be changed by editing this script and changing static Variables) 
 EOF
 exit 1
 }
@@ -58,14 +64,18 @@ checkdb(){
    $vResponse -e "Checking Vampi DB has been initilized\n"
    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)
    if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
-	            echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize the DB in order to Continue.  You can use the $0 --initdb option to initialize the Vampi DB. ${NC}"
+	            echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize the DB to Continue.  You can use the $0 --initdb option to initialize the Vampi DB. ${NC}"
 		    exit 1
      fi
 }
 
 
 initdb(){
-  echo -e "Initializing VampiDB\n"
+  echo -e "Initializing VAmPI Database Routine\n"
+  if [ -z "$@" ]; then     # If not URL is provided then change to default VAmPI to default host at port 5000 
+           HOST=${HOSTNP}
+  fi
+  $vResponse -e ">> Check to see if VAmPI DB is already Initialized just in case!"
   OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/users/v1)   # Checking to see if has been initialized first
      if echo "$OUTPUT" |  grep -q -o  'no such table: users'; then
 	     OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/createdb)
@@ -73,9 +83,11 @@ initdb(){
 	            echo -e "${RED}Check Point - Application Security Blocked ${NC}"
 		    echo -e "Execute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
 		    exit 1
+             else 
+		    echo -e ">> VAmPI Database has been Initilized"
 	     fi	       
      else 
-	 echo -e "VampiDB is already Initilized"	     
+	 echo -e "VAmPI Database is already Initilized"	     
          exit 1
      fi
 }
@@ -142,7 +154,7 @@ do
   ifblocked
   $vResponse -e ${OUTPUT:0:$CHAR} "\n"
 
-  echo "4) DELETE /users/v1/cgwaf2 "
+  echo "4) DELETE /users/v1/cgwaf2 - Note: This test may not Trigger, depending on Schema Used "
   OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
          -H "Authorization: Bearer $TOKEN"
            )
@@ -154,21 +166,11 @@ do
   ifblocked
   $vResponse $OUTPUT
 
-
-
-
 done
 exit 1
 }
 
 args=$(getopt -a -o vr:smi --long help,verbose,repeat:,sql,malicious,initdb -- "$@")
-
-
-
-#if [[ $? -gt 0 ]]; then
-#if [[ $# -eq 0 ]]; then
-#  usage
-#fi
 
 eval set -- ${args}
 while :
@@ -189,7 +191,7 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 	 HOST=$@
 fi
 
-echo "HOST: ${HOST}"
+$vResponse "HOST: ${HOST}"
 $vResponse "BFLAG: ${BFLAG}"
 if [ $INITDB -eq 1 ]; then
 	initdb
