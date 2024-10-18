@@ -99,7 +99,7 @@ sqldump(){
 #if ! [ -x "$(command -v sqlmap)" ]; then
 #	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
 #		        exit 1
-#f
+#fi
 $vResponse "HOST: ${HOST}"
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
@@ -191,6 +191,7 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 	 HOST=$@
 fi
 
+
 $vResponse "HOST: ${HOST}"
 $vResponse "BFLAG: ${BFLAG}"
 if [ $INITDB -eq 1 ]; then
@@ -207,6 +208,17 @@ elif [ $SFLAG -eq 1 ] ; then
 else 
 checkdb
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"
+
+
+# The checking to see if jq is installed 
+if ! [ -x "$(command -v jq)" ]; then
+	        echo ">>>  jq is not installed - Please install 'apt-get install jq'" >&2
+		        exit 1
+fi
+
+
+
+
 for (( i=0; i < $REPEAT ; ++i));
 do
    loop=$(($i+1))
