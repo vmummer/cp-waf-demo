@@ -3,7 +3,7 @@
 # Updated Oct 2, 2024 - Added cpnanob
 # Added Oct 11th, 2024 - Added cpnanov 
 # Added Docker_HOST and HOST_IP and added more info on cpnanos
-VERSION=2.5
+VERSION=2.6
 echo "Adding Check Point WAF Lab Alias Commands, 2024 ver ${VERSION}.  Use cphelp for list of additional available commands"
 DOCKER_HOST=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
 HOST_IP="`hostname -I| awk ' {print $1}'`"
@@ -17,7 +17,7 @@ alias cptoken="bash cp/cp_token.sh"
 alias cpnanol='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "Policy|Last" ' 
 alias cpnanos='echo "Check Point WAF Nano Agent Status" ; docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "^Version:|^Registration status|Reason:.{0,21}|CloudGuard|Policy version:|Manifest status:|Token is invalid" '
 alias cpnanov='docker exec -it cp-waf /usr/sbin/cpnano -s |grep -E "^Version" '
-alias cpwipe='docker-compose down &&  docker system prune -a'
+alias cpwipe='docker compose down &&  docker system prune -a'
 alias cpcert='sh cp/cp_get_cert.sh'
 alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/cp-waf-demo.git'
 alias cphost='printf "IP Addresses Used: Docker: ${DOCKER_HOST} and Host IP: ${HOST_IP} \n"'
