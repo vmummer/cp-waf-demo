@@ -101,6 +101,7 @@ sqldump(){
 #		        exit 1
 #fi
 $vResponse "HOST: ${HOST}"
+checkdb
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
 
