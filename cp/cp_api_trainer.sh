@@ -191,6 +191,13 @@ if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if s
 	 HOST=$@
 fi
 
+# The follow was removed because sqlmap was added to the tester container to run
+if ! [ -x "$(command -v jq)" ]; then
+	        echo "jq is not installed - please install 'apt-get install jq' to continue." >&2
+		        exit 1
+fi
+$vResponse "HOST: ${HOST}"
+
 
 $vResponse "HOST: ${HOST}"
 $vResponse "BFLAG: ${BFLAG}"
