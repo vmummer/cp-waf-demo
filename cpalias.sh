@@ -3,10 +3,16 @@
 # Updated Oct 2, 2024 - Added cpnanob
 # Added Oct 11th, 2024 - Added cpnanov 
 # Added Docker_HOST and HOST_IP and added more info on cpnanos
-VERSION=2.6
+# Oct 21 2024 - added /etc/hosts updating
+VERSION=2.7
 echo "Adding Check Point WAF Lab Alias Commands, 2024 ver ${VERSION}.  Use cphelp for list of additional available commands"
 DOCKER_HOST=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
 HOST_IP="`hostname -I| awk ' {print $1}'`"
+
+echo "Updating /etc/hosts for juiceshop.local"
+sudo sed -i '/juiceshop.local/I d' /etc/hosts
+sudo echo "${DOCKER_HOST} juiceshop.local" >> /etc/hosts
+
 alias cptrbad='docker run -it --rm -v $(pwd)/data:/home/web-scraper/data --add-host juiceshop.local:$DOCKER_HOST -w /home/juice-shop-solver cp-waf-demo-test-host python main.py'
 alias cptrgood='bash cp/cp_test_good.sh'
 alias cpapitrainer='bash cp/cp_api_trainer.sh'
