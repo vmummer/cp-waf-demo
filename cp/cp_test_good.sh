@@ -1,5 +1,7 @@
 #/usr/bin/bash
-DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+#DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+
+DOCKER_HOST=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
 if [ -z "$1" ]; then
         echo "Usage  cptrgood <URL> <repeat>  - Create Good Traffic against Test Host. " 
 	echo "Defaulting to Test Host URL:  http://juiceshop.local:80 and repeat 1"
